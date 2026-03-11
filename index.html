@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Home Inventory">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#5b8fc9">
+<title>Home Inventory</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Peach/salmon app background — matching screenshot */
+    --bg-app:        #f2b898;
+    --bg-shell:      #fdf6f0;
+    --bg-white:      #ffffff;
+    --shell-border:  #2563a8;
+
+    /* Blues */
+    --blue-header:   #1a4f96;
+    --blue-mid:      #2563a8;
+    --blue-light:    #6fa3d8;
+    --blue-pale:     #dbeaf8;
+    --blue-xpale:    #eef5fc;
+
+    /* Peaches — for icon circles */
+    --peach-circle:  #eeaa80;
+    --peach-dark:    #d4784e;
+    --peach-mid:     #e89870;
+    --peach-light:   #f4c4a8;
+    --peach-pale:    #fdeee4;
+    --peach-xpale:   #fef7f2;
+
+    /* Footer */
+    --footer-bg:     #e8eef5;
+
+    /* Text */
+    --text-main:     #1a2a3a;
+    --text-muted:    #5a6e80;
+    --text-light:    #9aaabb;
+
+    /* Buttons */
+    --btn-dark:      #444444;
+    --btn-hover:     #333333;
+
+    /* UI */
+    --radius-card:   14px;
+    --radius-shell:  18px;
+    --radius-btn:    8px;
+    --font-display:  'Playfair Display', Georgia, serif;
+    --font-ui:       'Lato', 'Helvetica Neue', sans-serif;
+    --shadow-card:   0 1px 6px rgba(30,70,130,0.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: var(--font-ui);
+    background: var(--bg-app);
+    color: var(--text-main);
+    min-height: 100dvh;
+    overscroll-behavior: none;
+    padding: 20px 12px 20px;
+  }
+
+  /* ═══════════════════════════════════
+     OUTER SHELL — white rounded card with blue border (matches screenshot)
+  ═══════════════════════════════════ */
+  .app-shell {
+    max-width: 860px;
+    margin: 0 auto;
+    background: var(--bg-shell);
+    min-height: calc(100dvh - 40px);
+    border: 2px solid var(--shell-border);
+    border-radius: var(--radius-shell);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(20,50,100,0.18);
+  }
+
+  /* ═══════════════════════════════════
+     HEADER
+  ═══════════════════════════════════ */
+  .app-header {
+    background: var(--bg-shell);
+    padding: 24px 20px 16px;
+    text-align: center;
+    border-bottom: 1px solid var(--blue-pale);
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .logo-circle {
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    border: 2.5px solid var(--blue-mid);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 700;
+    color: var(--blue-header);
+    letter-spacing: 2px;
+    background: var(--peach-circle);
+    flex-shrink: 0;
+  }
+  .app-title {
+    font-family: var(--font-display);
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--blue-header);
+    letter-spacing: 0.3px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ═══════════════════════════════════
+     SEARCH ROW
+  ═══════════════════════════════════ */
+  .search-row {
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px 12px;
+    background: var(--bg-shell);
+    border-bottom: 1px solid var(--blue-pale);
+  }
+  .search-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-icon {
+    position: absolute; left: 12px;
+    color: var(--text-light); font-size: 0.95rem; pointer-events: none;
+  }
+  .search-input {
+    flex: 1;
+    padding: 10px 14px 10px 36px;
+    border: 1.5px solid var(--blue-light);
+    border-radius: 24px;
+    font-family: var(--font-ui);
+    font-size: 0.92rem;
+    color: var(--text-main);
+    background: var(--bg-white);
+    outline: none;
+    transition: border-color 0.18s;
+    width: 100%;
+  }
+  .search-input::placeholder { color: var(--text-light); }
+  .search-input:focus { border-color: var(--blue-mid); }
+  .btn-clear-search {
+    padding: 10px 20px;
+    background: var(--blue-mid);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-btn);
+    font-family: var(--font-ui);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-clear-search:hover { background: var(--blue-header); }
+  /* keep old .btn-grey alias */
+  .btn-grey { padding: 10px 20px; background: var(--blue-mid); color: #fff; border: none; border-radius: var(--radius-btn); font-family: var(--font-ui); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+  .btn-grey:hover { background: var(--blue-header); }
+
+  /* ═══════════════════════════════════
+     ROOMS SECTION HEADER ROW
+  ═══════════════════════════════════ */
+  .rooms-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+  }
+  .rooms-header-label {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  /* ═══════════════════════════════════
+     TOOLBAR (kept for report btn on inner views)
+  ═══════════════════════════════════ */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px 12px;
+    background: var(--bg-shell);
+    flex-wrap: wrap;
+  }
+  .btn-blue {
+    padding: 10px 22px;
+    background: var(--blue-mid);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-btn);
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-blue:hover { background: var(--blue-header); }
+  .btn-peach {
+    padding: 10px 22px;
+    background: var(--peach-dark);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-btn);
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-peach:hover { background: var(--peach-mid); }
+  .spacer { flex: 1; }
+
+  /* ═══════════════════════════════════
+     VIEWS
+  ═══════════════════════════════════ */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ═══════════════════════════════════
+     ROOMS GRID
+  ═══════════════════════════════════ */
+  .rooms-body { padding: 0 20px 20px; }
+  .section-label {
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+  }
+  .rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (min-width: 480px) { .rooms-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 640px) { .rooms-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .room-card {
+    background: var(--bg-white);
+    border: 1.5px solid var(--blue-light);
+    border-radius: var(--radius-card);
+    padding: 22px 12px 18px;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.18s;
+    user-select: none;
+  }
+  .room-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(30,80,160,0.16);
+    border-color: var(--blue-mid);
+    background: linear-gradient(145deg, var(--peach-pale), var(--blue-xpale));
+  }
+  .room-card:active { transform: translateY(0); }
+
+  /* Peach circle icon — key visual from screenshot */
+  .room-icon-circle {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--peach-circle);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 1.65rem;
+    box-shadow: 0 2px 8px rgba(200,100,50,0.2);
+    transition: transform 0.15s;
+  }
+  .room-card:hover .room-icon-circle { transform: scale(1.06); }
+  /* keep .room-icon for legacy emoji fallback */
+  .room-icon { font-size: 2.2rem; display: block; margin-bottom: 7px; }
+
+  .room-name {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+  .room-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .room-meta-icon {
+    display: flex; align-items: center;
+    color: var(--text-muted);
+    opacity: 0.75;
+  }
+  .room-count { font-size: 0.75rem; color: var(--text-muted); }
+  .room-del-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: #fee2e2; border: 1px solid #fca5a5;
+    color: #dc2626; font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; line-height: 1;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .room-del-btn:hover { color: #fff; background: #dc2626; border-color: #dc2626; }
+
+  /* Add-room card */
+  .room-add-card {
+    background: var(--blue-xpale);
+    border: 2px dashed var(--blue-light);
+    border-radius: var(--radius-card);
+    padding: 22px 12px 18px;
+    cursor: pointer;
+    text-align: center;
+    color: var(--blue-mid);
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: background 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .room-add-card:hover { background: var(--blue-pale); border-color: var(--blue-mid); }
+  .room-add-card .add-plus { font-size: 2rem; display: block; margin-bottom: 6px; }
+
+  /* ═══════════════════════════════════
+     FOOTER BAR — matches screenshot
+  ═══════════════════════════════════ */
+  .app-footer {
+    background: var(--footer-bg);
+    border-top: 1px solid var(--blue-pale);
+    padding: 14px 20px;
+    text-align: center;
+  }
+  .app-footer p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════
+     ITEMS VIEW
+  ═══════════════════════════════════ */
+  .view-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--bg-shell);
+    border-bottom: 1px solid var(--blue-pale);
+  }
+  .back-btn {
+    background: var(--blue-mid); color: #fff;
+    border: none; border-radius: var(--radius-btn);
+    font-size: 0.85rem; font-weight: 700;
+    padding: 8px 16px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .back-btn:hover { background: var(--blue-header); }
+  .view-header-title {
+    font-family: var(--font-ui);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    flex: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .view-header-icon { font-size: 1.3rem; }
+
+  .items-body { padding: 16px 20px 24px; }
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (min-width: 480px) { .items-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .item-card {
+    background: var(--bg-white);
+    border: 1.5px solid var(--blue-light);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.15s, box-shadow 0.15s;
+    user-select: none;
+  }
+  .item-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(30,80,160,0.14); }
+  .item-thumb-wrap {
+    width: 100%; aspect-ratio: 4/3;
+    background: linear-gradient(135deg, var(--blue-xpale), var(--peach-xpale));
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .item-thumb-wrap img, .item-thumb-wrap video {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block;
+  }
+  .item-thumb-no-media { font-size: 2rem; opacity: 0.5; }
+  .video-badge {
+    position: absolute; top: 6px; right: 6px;
+    background: rgba(0,0,0,0.55); color: #fff;
+    font-size: 0.65rem; padding: 2px 5px; border-radius: 4px;
+    font-weight: 700; letter-spacing: 0.5px;
+  }
+  .item-info { padding: 9px 10px 11px; }
+  .item-name { font-weight: 700; font-size: 0.88rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+  .item-value { font-size: 0.8rem; color: var(--peach-dark); font-weight: 700; }
+  .item-cat { font-size: 0.73rem; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-del-btn {
+    position: absolute; top: 6px; left: 6px;
+    background: rgba(255,255,255,0.88); border: none;
+    border-radius: 50%; width: 22px; height: 22px;
+    font-size: 0.7rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    transition: color 0.15s, background 0.15s;
+  }
+  .item-del-btn:hover { color: #d94f4f; background: #fff; }
+
+  /* Add-item card */
+  .item-add-card {
+    border: 2px dashed var(--peach-light);
+    border-radius: var(--radius-card);
+    aspect-ratio: 1/1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 5px; cursor: pointer;
+    color: var(--peach-dark);
+    font-size: 0.82rem; font-weight: 700;
+    transition: background 0.15s, border-color 0.15s;
+    background: var(--peach-xpale);
+  }
+  .item-add-card:hover { background: var(--peach-pale); border-color: var(--peach-mid); }
+  .item-add-card .add-plus { font-size: 2rem; }
+
+  /* ═══════════════════════════════════
+     DETAIL VIEW
+  ═══════════════════════════════════ */
+  .detail-body { padding: 16px 20px; }
+  .detail-media-scroller {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 16px;
+    scrollbar-width: thin; scrollbar-color: var(--blue-light) transparent;
+  }
+  .detail-media-item {
+    flex-shrink: 0;
+    width: 120px; height: 100px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1.5px solid var(--blue-light);
+    cursor: pointer;
+    position: relative;
+    background: var(--blue-xpale);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .detail-media-item img, .detail-media-item video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .detail-media-item .video-play {
+    position: absolute; font-size: 2rem; opacity: 0.85; pointer-events: none;
+  }
+  .detail-fields { display: flex; flex-direction: column; gap: 10px; }
+  .detail-field-row {
+    display: flex;
+    background: var(--blue-xpale);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--blue-pale);
+  }
+  .detail-field-label {
+    background: var(--blue-pale);
+    color: var(--blue-header);
+    font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 9px 12px; min-width: 120px;
+    display: flex; align-items: center;
+    border-right: 1px solid var(--blue-pale);
+  }
+  .detail-field-value {
+    padding: 9px 14px; font-size: 0.9rem; color: var(--text-main);
+    flex: 1; word-break: break-word;
+  }
+  .detail-actions { display: flex; gap: 10px; padding: 12px 20px 24px; }
+  .btn-full { flex: 1; padding: 12px; text-align: center; border: none; border-radius: var(--radius-btn); font-family: var(--font-ui); font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+  .btn-edit-item { background: var(--blue-mid); color: #fff; }
+  .btn-edit-item:hover { background: var(--blue-header); }
+  .btn-del-item { background: #d94f4f; color: #fff; max-width: 100px; }
+  .btn-del-item:hover { background: #c03c3c; }
+
+  /* ═══════════════════════════════════
+     REPORT VIEW
+  ═══════════════════════════════════ */
+  .report-body { padding: 18px 20px 30px; }
+  .report-title {
+    font-family: var(--font-ui);
+    font-size: 1.2rem; font-weight: 700;
+    color: var(--text-main); margin-bottom: 18px;
+  }
+  .report-room-block { margin-bottom: 22px; }
+  .report-room-head {
+    display: flex; align-items: center; gap: 7px;
+    font-family: var(--font-ui);
+    font-size: 0.95rem; font-weight: 700; color: var(--blue-header);
+    padding-bottom: 6px; border-bottom: 2px solid var(--blue-pale);
+    margin-bottom: 8px;
+  }
+  .report-item-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 1px dashed var(--blue-pale);
+    font-size: 0.86rem;
+  }
+  .report-item-name { color: var(--text-main); flex: 1; }
+  .report-item-brand { color: var(--text-muted); font-size: 0.76rem; }
+  .report-item-val { color: var(--peach-dark); font-weight: 700; white-space: nowrap; margin-left: 10px; }
+  .report-room-total { text-align: right; font-size: 0.82rem; color: var(--text-muted); margin-top: 6px; }
+  .report-grand-total {
+    margin-top: 20px; padding: 14px 16px;
+    background: linear-gradient(135deg, var(--blue-xpale), var(--peach-xpale));
+    border-radius: var(--radius-card); border: 1.5px solid var(--blue-pale);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .report-grand-label { font-family: var(--font-ui); font-size: 1rem; font-weight: 700; color: var(--blue-header); }
+  .report-grand-value { font-size: 1.1rem; font-weight: 700; color: var(--peach-dark); }
+  .report-date { font-size: 0.72rem; color: var(--text-light); text-align: right; margin-top: 10px; }
+
+  /* ═══════════════════════════════════
+     SEARCH RESULTS
+  ═══════════════════════════════════ */
+  .search-results-body { padding: 16px 20px; }
+  .search-result-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 8px; border-bottom: 1px dashed var(--blue-pale); cursor: pointer;
+    transition: background 0.12s; border-radius: 8px;
+  }
+  .search-result-item:hover { background: var(--blue-xpale); }
+  .search-result-thumb {
+    width: 50px; height: 50px; border-radius: 8px;
+    object-fit: cover; border: 1px solid var(--blue-pale);
+    background: var(--blue-xpale); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    overflow: hidden;
+  }
+  .search-result-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .search-result-info .sr-name { font-weight: 700; font-size: 0.9rem; }
+  .search-result-info .sr-room { font-size: 0.76rem; color: var(--text-muted); }
+  .search-result-info .sr-val { font-size: 0.76rem; color: var(--peach-dark); font-weight: 600; }
+
+  /* ═══════════════════════════════════
+     MODALS — bottom sheet
+  ═══════════════════════════════════ */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,30,60,0.5);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: var(--bg-white);
+    border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 860px;
+    max-height: 92dvh;
+    overflow-y: auto;
+    padding: 20px 20px 36px;
+    box-shadow: 0 -4px 32px rgba(20,50,120,0.18);
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle {
+    width: 44px; height: 4px; background: var(--blue-pale); border-radius: 2px;
+    margin: 0 auto 18px; cursor: pointer;
+  }
+  .modal-title {
+    font-family: var(--font-ui);
+    font-size: 1.15rem; font-weight: 700;
+    color: var(--text-main); margin-bottom: 18px;
+  }
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block; font-size: 0.75rem; font-weight: 700;
+    color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 5px;
+  }
+  .form-control {
+    width: 100%; padding: 10px 13px;
+    border: 1.5px solid var(--blue-pale);
+    border-radius: var(--radius-btn);
+    font-family: var(--font-ui); font-size: 0.92rem;
+    color: var(--text-main); background: var(--bg-white);
+    outline: none; transition: border-color 0.18s;
+    appearance: auto;
+  }
+  .form-control:focus { border-color: var(--blue-mid); }
+  textarea.form-control { min-height: 68px; resize: vertical; }
+
+  /* Icon picker */
+  .icon-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;
+  }
+  .icon-btn {
+    font-size: 1.7rem; padding: 5px 7px; border-radius: 8px;
+    cursor: pointer; border: 2px solid transparent;
+    background: var(--blue-xpale);
+    transition: border-color 0.14s, background 0.14s;
+    line-height: 1;
+  }
+  .icon-btn:hover { background: var(--blue-pale); }
+  .icon-btn.selected { border-color: var(--blue-mid); background: var(--blue-pale); }
+
+  /* Media upload */
+  .upload-zone {
+    border: 2px dashed var(--blue-light);
+    border-radius: 10px; padding: 16px 12px;
+    text-align: center; cursor: pointer;
+    color: var(--blue-mid); font-size: 0.86rem; font-weight: 700;
+    background: var(--blue-xpale);
+    transition: background 0.15s, border-color 0.15s;
+    margin-bottom: 10px;
+  }
+  .upload-zone:hover { background: var(--blue-pale); border-color: var(--blue-mid); }
+  .upload-zone-icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+  .media-preview-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .media-prev-item {
+    position: relative; width: 68px; height: 68px;
+    border-radius: 8px; overflow: hidden;
+    border: 1.5px solid var(--blue-pale);
+  }
+  .media-prev-item img, .media-prev-item video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .media-prev-item .vid-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; color: #fff; pointer-events: none;
+  }
+  .media-prev-del {
+    position: absolute; top: -4px; right: -4px;
+    background: #d94f4f; color: #fff; border: none;
+    border-radius: 50%; width: 18px; height: 18px;
+    font-size: 0.65rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .modal-actions {
+    display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;
+  }
+  .btn-modal-cancel {
+    padding: 10px 24px; background: var(--footer-bg); color: var(--text-main);
+    border: 1px solid var(--blue-pale); border-radius: var(--radius-btn);
+    font-family: var(--font-ui); font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: background 0.14s;
+  }
+  .btn-modal-cancel:hover { background: var(--blue-pale); }
+  .btn-modal-save {
+    padding: 10px 28px; background: var(--blue-mid); color: #fff;
+    border: none; border-radius: var(--radius-btn);
+    font-family: var(--font-ui); font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: background 0.14s;
+  }
+  .btn-modal-save:hover { background: var(--blue-header); }
+
+  /* hidden file input */
+  #file-input-hidden { display: none; }
+
+  /* ═══════════════════════════════════
+     LIGHTBOX
+  ═══════════════════════════════════ */
+  .lightbox {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92); z-index: 300;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox-media { max-width: 96vw; max-height: 78dvh; border-radius: 10px; }
+  .lightbox-close {
+    position: absolute; top: 14px; right: 18px;
+    background: rgba(255,255,255,0.14); border: none;
+    color: #fff; font-size: 1.6rem; width: 40px; height: 40px;
+    border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,0.28); }
+  .lightbox-controls { display: flex; gap: 14px; align-items: center; }
+  .lightbox-nav-btn {
+    background: rgba(255,255,255,0.18); border: none; color: #fff;
+    font-size: 1rem; font-weight: 700; padding: 8px 18px;
+    border-radius: 20px; cursor: pointer; transition: background 0.14s;
+  }
+  .lightbox-nav-btn:hover { background: rgba(255,255,255,0.3); }
+  .lightbox-counter { color: rgba(255,255,255,0.6); font-size: 0.8rem; }
+
+  /* ═══════════════════════════════════
+     EMPTY STATE
+  ═══════════════════════════════════ */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-light);
+  }
+  .empty-state-icon { font-size: 3rem; display: block; margin-bottom: 10px; }
+  .empty-state-text { font-size: 0.9rem; }
+
+  /* ═══════════════════════════════════
+     TOAST
+  ═══════════════════════════════════ */
+  #toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--blue-header); color: #fff;
+    padding: 10px 24px; border-radius: 24px;
+    font-size: 0.86rem; z-index: 500;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(20,60,130,0.25);
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ══════ VIEW: ROOMS ══════ -->
+  <div id="view-rooms" class="view active">
+    <header class="app-header">
+      <div class="logo-row">
+        <div class="logo-circle">HI</div>
+      </div>
+      <span class="app-title">Home Inventory</span>
+    </header>
+    <div class="search-row">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="search-input" placeholder="Search items..." oninput="doSearch(this.value)">
+      </div>
+      <button class="btn-clear-search" onclick="clearSearch()">Clear</button>
+    </div>
+    <div id="rooms-section">
+      <div class="rooms-header-row">
+        <span class="rooms-header-label" id="rooms-count-label">Your Rooms (0)</span>
+        <button class="btn-blue" onclick="showAddRoomModal()">+ Add Room</button>
+      </div>
+      <div class="rooms-body">
+        <div class="rooms-grid" id="rooms-grid"></div>
+      </div>
+    </div>
+    <div id="search-section" class="search-results-body" style="display:none">
+      <div class="section-label">Search Results</div>
+      <div id="search-results-list"></div>
+    </div>
+    <div class="app-footer">
+      <p>Store photos and videos of your belongings for insurance purposes</p>
+      <p>All data is stored locally on your device</p>
+    </div>
+  </div>
+
+  <!-- ══════ VIEW: ITEMS ══════ -->
+  <div id="view-items" class="view">
+    <div class="view-header">
+      <button class="back-btn" onclick="navBack('view-rooms')">← Rooms</button>
+      <span class="view-header-icon" id="items-header-icon"></span>
+      <span class="view-header-title" id="items-header-title"></span>
+      <button class="btn-peach" onclick="showView('view-report')" style="margin-left:auto; font-size:0.82rem; padding:8px 14px;">📋 Report</button>
+      <button class="btn-blue" onclick="showAddItemModal(null)" style="font-size:0.82rem; padding:8px 14px;">+ Item</button>
+    </div>
+    <div class="items-body">
+      <div class="items-grid" id="items-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══════ VIEW: DETAIL ══════ -->
+  <div id="view-detail" class="view">
+    <div class="view-header">
+      <button class="back-btn" onclick="navBack('view-items')">← Back</button>
+      <span class="view-header-title" id="detail-header-title"></span>
+    </div>
+    <div class="detail-body">
+      <div class="detail-media-scroller" id="detail-media-scroller"></div>
+      <div class="detail-fields" id="detail-fields"></div>
+    </div>
+    <div class="detail-actions">
+      <button class="btn-full btn-edit-item" onclick="editCurrentItem()">✏️ Edit</button>
+      <button class="btn-full btn-del-item" onclick="deleteCurrentItem()">🗑</button>
+    </div>
+  </div>
+
+  <!-- ══════ VIEW: REPORT ══════ -->
+  <div id="view-report" class="view">
+    <div class="view-header">
+      <button class="back-btn" onclick="navBack('view-rooms')">← Rooms</button>
+      <span class="view-header-title">Insurance Report</span>
+    </div>
+    <div class="report-body" id="report-body"></div>
+  </div>
+
+</div><!-- /app-shell -->
+
+<!-- ══════ MODAL: ADD / EDIT ROOM ══════ -->
+<div class="modal-overlay" id="modal-room">
+  <div class="modal-sheet">
+    <div class="modal-handle" onclick="closeModal('modal-room')"></div>
+    <div class="modal-title" id="modal-room-title">Add Room</div>
+    <div class="form-group">
+      <label class="form-label">Room Name</label>
+      <input class="form-control" id="room-name-input" placeholder="e.g. Kitchen" maxlength="40">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Choose Icon</label>
+      <div class="icon-grid" id="room-icon-grid"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-room')">Cancel</button>
+      <button class="btn-modal-save" onclick="saveRoom()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL: ADD / EDIT ITEM ══════ -->
+<div class="modal-overlay" id="modal-item">
+  <div class="modal-sheet">
+    <div class="modal-handle" onclick="closeModal('modal-item')"></div>
+    <div class="modal-title" id="modal-item-title">Add Item</div>
+    <div class="form-group">
+      <label class="form-label">Item Name *</label>
+      <input class="form-control" id="item-name-input" placeholder="e.g. Samsung 65-inch TV">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-control" id="item-cat-input">
+        <option value="">— Select category —</option>
+        <option>Electronics</option>
+        <option>Furniture</option>
+        <option>Appliance</option>
+        <option>Jewelry / Valuables</option>
+        <option>Clothing / Accessories</option>
+        <option>Tools / Equipment</option>
+        <option>Sports / Hobby</option>
+        <option>Art / Collectibles</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Estimated Value ($)</label>
+      <input class="form-control" id="item-value-input" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Brand / Model</label>
+      <input class="form-control" id="item-brand-input" placeholder="e.g. Samsung QN65Q80C">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Serial / ID Number</label>
+      <input class="form-control" id="item-serial-input" placeholder="Optional">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Purchase Date</label>
+      <input class="form-control" id="item-date-input" type="date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-control" id="item-notes-input" placeholder="Condition, receipt location, warranty info…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Photos &amp; Videos</label>
+      <div class="upload-zone" onclick="document.getElementById('file-input-hidden').click()">
+        <span class="upload-zone-icon">📷</span>
+        Tap to add photos or videos
+      </div>
+      <input type="file" id="file-input-hidden" accept="image/*,video/*" multiple onchange="handleFileSelect(this)">
+      <div class="media-preview-row" id="media-preview-row"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-item')">Cancel</button>
+      <button class="btn-modal-save" onclick="saveItem()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ LIGHTBOX ══════ -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lb-img" class="lightbox-media" src="" style="display:none" alt="">
+  <video id="lb-vid" class="lightbox-media" controls style="display:none"></video>
+  <div class="lightbox-controls">
+    <button class="lightbox-nav-btn" onclick="lbNav(-1)">‹ Prev</button>
+    <span class="lightbox-counter" id="lb-counter"></span>
+    <button class="lightbox-nav-btn" onclick="lbNav(1)">Next ›</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DATA & STORAGE
+// ═══════════════════════════════════════════════════
+
+const ROOM_ICONS = ['🛋️','🛏️','🛁','🍳','🚗','📦','💼','🖥️','🌿','🎮','🧺','🔧','📚','🏋️','🎨','🚿','🍽️','🏠'];
+
+const DEFAULT_ROOMS = [
+  { id: genId(), name: 'Living Room', icon: '🛋️' },
+  { id: genId(), name: 'Bedroom 1',   icon: '🛏️' },
+  { id: genId(), name: 'Bedroom 2',   icon: '🛏️' },
+  { id: genId(), name: 'Garage',      icon: '🚗' },
+];
+
+let db = { rooms: [], items: {} };
+
+function genId() { return 'id_' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+function loadDb() {
+  try {
+    const raw = localStorage.getItem('hi_db_v2');
+    if (raw) { db = JSON.parse(raw); return; }
+  } catch(e) {}
+  // First run
+  db.rooms = DEFAULT_ROOMS.map(r => ({ ...r, id: genId() }));
+  db.rooms.forEach(r => { db.items[r.id] = []; });
+  saveDb();
+}
+function saveDb() {
+  try { localStorage.setItem('hi_db_v2', JSON.stringify(db)); } catch(e) {
+    showToast('Storage full — try removing some media.');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+
+let currentRoomId = null;
+let currentItemId = null;
+let editingRoomId = null;
+let editingItemId = null;
+let pendingMedia    = []; // [{type, dataUrl}]
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'view-rooms') renderRooms();
+  if (id === 'view-report') renderReport();
+}
+function navBack(to) { showView(to); }
+
+// ═══════════════════════════════════════════════════
+//  ROOMS
+// ═══════════════════════════════════════════════════
+
+function renderRooms() {
+  const grid = document.getElementById('rooms-grid');
+  grid.innerHTML = '';
+
+  const lbl = document.getElementById('rooms-count-label');
+  if (lbl) lbl.textContent = `Your Rooms (${db.rooms.length})`;
+
+  // SVG icons for photo and video — clearer than emoji
+  const photoIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>`;
+  const videoIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3V10z" fill="currentColor" stroke="none"/></svg>`;
+
+  db.rooms.forEach(room => {
+    const items = db.items[room.id] || [];
+    const card = document.createElement('div');
+    card.className = 'room-card';
+    card.innerHTML = `
+      <button class="room-del-btn" title="Delete room">✕</button>
+      <div class="room-icon-circle">${room.icon}</div>
+      <div class="room-name">${esc(room.name)}</div>
+      <div class="room-meta">
+        <span class="room-meta-icon" title="Photos">${photoIcon}</span>
+        <span class="room-meta-icon" title="Videos">${videoIcon}</span>
+        <span>${items.length} item${items.length !== 1 ? 's' : ''}</span>
+      </div>
+    `;
+    card.querySelector('.room-del-btn').addEventListener('click', e => { e.stopPropagation(); deleteRoom(room.id); });
+    card.addEventListener('click', () => openRoom(room.id));
+    grid.appendChild(card);
+  });
+
+  const addCard = document.createElement('div');
+  addCard.className = 'room-add-card';
+  addCard.innerHTML = '<span class="add-plus">＋</span>Add Room';
+  addCard.onclick = () => showAddRoomModal();
+  grid.appendChild(addCard);
+}
+
+function openRoom(roomId) {
+  currentRoomId = roomId;
+  const room = db.rooms.find(r => r.id === roomId);
+  document.getElementById('items-header-icon').textContent = room?.icon || '';
+  document.getElementById('items-header-title').textContent = room?.name || '';
+  renderItems();
+  showView('view-items');
+}
+
+function showAddRoomModal(roomId) {
+  // If called from a click event, roomId will be an event object — ignore it
+  if (roomId && typeof roomId !== 'string') roomId = null;
+  editingRoomId = roomId || null;
+  const room = roomId ? db.rooms.find(r => r.id === roomId) : null;
+  document.getElementById('modal-room-title').textContent = room ? 'Edit Room' : 'Add Room';
+  document.getElementById('room-name-input').value = room?.name || '';
+
+  // Build icon grid
+  const grid = document.getElementById('room-icon-grid');
+  grid.innerHTML = '';
+  const selectedIcon = room?.icon || ROOM_ICONS[0];
+  ROOM_ICONS.forEach(ic => {
+    const btn = document.createElement('span');
+    btn.className = 'icon-btn' + (ic === selectedIcon ? ' selected' : '');
+    btn.textContent = ic;
+    btn.onclick = () => {
+      document.querySelectorAll('#room-icon-grid .icon-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+    grid.appendChild(btn);
+  });
+  openModal('modal-room');
+}
+
+function saveRoom() {
+  const name = document.getElementById('room-name-input').value.trim();
+  if (!name) { showToast('Please enter a room name.'); return; }
+  const icon = document.querySelector('#room-icon-grid .icon-btn.selected')?.textContent || '🏠';
+
+  if (editingRoomId) {
+    const r = db.rooms.find(r => r.id === editingRoomId);
+    if (r) { r.name = name; r.icon = icon; }
+  } else {
+    const id = genId();
+    db.rooms.push({ id, name, icon });
+    db.items[id] = [];
+  }
+  saveDb();
+  renderRooms();
+  closeModal('modal-room');
+  showToast(editingRoomId ? 'Room updated!' : 'Room added!');
+}
+
+function deleteRoom(roomId) {
+  if (!confirm('Delete this room and all its items?')) return;
+  db.rooms = db.rooms.filter(r => r.id !== roomId);
+  delete db.items[roomId];
+  saveDb();
+  renderRooms();
+  showToast('Room deleted.');
+}
+
+// ═══════════════════════════════════════════════════
+//  ITEMS
+// ═══════════════════════════════════════════════════
+
+function renderItems() {
+  const grid = document.getElementById('items-grid');
+  grid.innerHTML = '';
+  const items = db.items[currentRoomId] || [];
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    const firstMedia = item.media?.[0];
+    let thumbHtml = '';
+    if (firstMedia) {
+      if (firstMedia.type === 'video') {
+        thumbHtml = `<div class="item-thumb-wrap"><div class="item-thumb-no-media">🎬</div><span class="video-badge">VIDEO</span></div>`;
+      } else {
+        thumbHtml = `<div class="item-thumb-wrap"><img src="${firstMedia.dataUrl}" loading="lazy" alt="${esc(item.name)}"></div>`;
+      }
+    } else {
+      thumbHtml = `<div class="item-thumb-wrap"><div class="item-thumb-no-media">📦</div></div>`;
+    }
+    card.innerHTML = `
+      ${thumbHtml}
+      <button class="item-del-btn">✕</button>
+      <div class="item-info">
+        <div class="item-name">${esc(item.name)}</div>
+        ${item.value ? `<div class="item-value">$${fmt(item.value)}</div>` : ''}
+        ${item.category ? `<div class="item-cat">${esc(item.category)}</div>` : ''}
+      </div>
+    `;
+    card.querySelector('.item-del-btn').addEventListener('click', e => { e.stopPropagation(); deleteItem(item.id); });
+    card.addEventListener('click', () => openItemDetail(item.id));
+    grid.appendChild(card);
+  });
+
+  // Add item card
+  const addCard = document.createElement('div');
+  addCard.className = 'item-add-card';
+  addCard.innerHTML = '<span class="add-plus">＋</span>Add Item';
+  addCard.onclick = () => showAddItemModal(null);
+  grid.appendChild(addCard);
+}
+
+function showAddItemModal(itemId) {
+  editingItemId = itemId || null;
+  pendingMedia = [];
+
+  const item = itemId ? (db.items[currentRoomId] || []).find(i => i.id === itemId) : null;
+  document.getElementById('modal-item-title').textContent = item ? 'Edit Item' : 'Add Item';
+  document.getElementById('item-name-input').value   = item?.name     || '';
+  document.getElementById('item-cat-input').value    = item?.category || '';
+  document.getElementById('item-value-input').value  = item?.value    || '';
+  document.getElementById('item-brand-input').value  = item?.brand    || '';
+  document.getElementById('item-serial-input').value = item?.serial   || '';
+  document.getElementById('item-date-input').value   = item?.date     || '';
+  document.getElementById('item-notes-input').value  = item?.notes    || '';
+
+  if (item?.media) { pendingMedia = [...item.media]; }
+  renderMediaPreviews();
+  openModal('modal-item');
+}
+
+function handleFileSelect(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    const isVideo = file.type.startsWith('video/');
+    const reader = new FileReader();
+    reader.onload = e => {
+      pendingMedia.push({ type: isVideo ? 'video' : 'image', dataUrl: e.target.result });
+      renderMediaPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function renderMediaPreviews() {
+  const row = document.getElementById('media-preview-row');
+  row.innerHTML = '';
+  pendingMedia.forEach((m, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'media-prev-item';
+    if (m.type === 'video') {
+      wrap.innerHTML = `<video src="${m.dataUrl}" muted playsinline></video><div class="vid-overlay">🎬</div>`;
+    } else {
+      wrap.innerHTML = `<img src="${m.dataUrl}" alt="">`;
+    }
+    const delBtn = document.createElement('button');
+    delBtn.className = 'media-prev-del';
+    delBtn.textContent = '✕';
+    delBtn.onclick = () => { pendingMedia.splice(i, 1); renderMediaPreviews(); };
+    wrap.appendChild(delBtn);
+    row.appendChild(wrap);
+  });
+}
+
+function saveItem() {
+  const name = document.getElementById('item-name-input').value.trim();
+  if (!name) { showToast('Please enter an item name.'); return; }
+
+  const itemData = {
+    id:       editingItemId || genId(),
+    name,
+    category: document.getElementById('item-cat-input').value,
+    value:    document.getElementById('item-value-input').value,
+    brand:    document.getElementById('item-brand-input').value.trim(),
+    serial:   document.getElementById('item-serial-input').value.trim(),
+    date:     document.getElementById('item-date-input').value,
+    notes:    document.getElementById('item-notes-input').value.trim(),
+    media:    [...pendingMedia],
+  };
+
+  if (!db.items[currentRoomId]) db.items[currentRoomId] = [];
+
+  if (editingItemId) {
+    const idx = db.items[currentRoomId].findIndex(i => i.id === editingItemId);
+    if (idx >= 0) db.items[currentRoomId][idx] = itemData;
+  } else {
+    db.items[currentRoomId].push(itemData);
+  }
+
+  saveDb();
+  renderItems();
+
+  // Refresh detail if open
+  if (editingItemId && document.getElementById('view-detail').classList.contains('active')) {
+    renderItemDetail(itemData);
+  }
+
+  closeModal('modal-item');
+  showToast(editingItemId ? 'Item updated!' : 'Item added!');
+}
+
+function deleteItem(itemId) {
+  if (!confirm('Delete this item?')) return;
+  db.items[currentRoomId] = (db.items[currentRoomId] || []).filter(i => i.id !== itemId);
+  saveDb();
+  renderItems();
+  renderRooms();
+  showToast('Item deleted.');
+}
+
+// ═══════════════════════════════════════════════════
+//  ITEM DETAIL
+// ═══════════════════════════════════════════════════
+
+function openItemDetail(itemId) {
+  const item = (db.items[currentRoomId] || []).find(i => i.id === itemId);
+  if (!item) return;
+  currentItemId = itemId;
+  renderItemDetail(item);
+  showView('view-detail');
+}
+
+function renderItemDetail(item) {
+  document.getElementById('detail-header-title').textContent = item.name;
+
+  // Media scroller
+  const scroller = document.getElementById('detail-media-scroller');
+  scroller.innerHTML = '';
+  if (item.media && item.media.length) {
+    item.media.forEach((m, idx) => {
+      const el = document.createElement('div');
+      el.className = 'detail-media-item';
+      if (m.type === 'video') {
+        el.innerHTML = `<video src="${m.dataUrl}" muted></video><span class="video-play">▶</span>`;
+      } else {
+        el.innerHTML = `<img src="${m.dataUrl}" alt="">`;
+      }
+      el.onclick = () => openLightbox(item.media, idx);
+      scroller.appendChild(el);
+    });
+  }
+
+  // Fields
+  const fields = document.getElementById('detail-fields');
+  const rows = [
+    ['Category',      item.category],
+    ['Value',         item.value ? `$${fmt(item.value)}` : ''],
+    ['Brand / Model', item.brand],
+    ['Serial / ID',   item.serial],
+    ['Purchase Date', item.date ? new Date(item.date + 'T00:00:00').toLocaleDateString() : ''],
+    ['Notes',         item.notes],
+  ].filter(r => r[1]);
+
+  fields.innerHTML = rows.map(r => `
+    <div class="detail-field-row">
+      <span class="detail-field-label">${r[0]}</span>
+      <span class="detail-field-value">${esc(r[1])}</span>
+    </div>
+  `).join('');
+}
+
+function editCurrentItem() {
+  if (!currentItemId) return;
+  showAddItemModal(currentItemId);
+}
+
+function deleteCurrentItem() {
+  if (!currentItemId) return;
+  if (!confirm('Delete this item?')) return;
+  db.items[currentRoomId] = (db.items[currentRoomId] || []).filter(i => i.id !== currentItemId);
+  saveDb();
+  renderItems();
+  renderRooms();
+  navBack('view-items');
+  showToast('Item deleted.');
+}
+
+// ═══════════════════════════════════════════════════
+//  LIGHTBOX
+// ═══════════════════════════════════════════════════
+
+let lbMedia = [], lbIndex = 0;
+
+function openLightbox(media, idx) {
+  lbMedia = media; lbIndex = idx;
+  renderLightbox();
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  const vid = document.getElementById('lb-vid');
+  vid.pause(); vid.src = '';
+}
+function lbNav(dir) {
+  lbIndex = (lbIndex + dir + lbMedia.length) % lbMedia.length;
+  renderLightbox();
+}
+function renderLightbox() {
+  const m = lbMedia[lbIndex];
+  const img = document.getElementById('lb-img');
+  const vid = document.getElementById('lb-vid');
+  document.getElementById('lb-counter').textContent = `${lbIndex + 1} / ${lbMedia.length}`;
+  if (m.type === 'video') {
+    img.style.display = 'none';
+    vid.style.display = 'block';
+    vid.src = m.dataUrl;
+  } else {
+    vid.style.display = 'none'; vid.pause();
+    img.style.display = 'block';
+    img.src = m.dataUrl;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  SEARCH
+// ═══════════════════════════════════════════════════
+
+function doSearch(q) {
+  const roomSec   = document.getElementById('rooms-section');
+  const searchSec = document.getElementById('search-section');
+  const list      = document.getElementById('search-results-list');
+
+  q = q.trim().toLowerCase();
+  if (!q) {
+    roomSec.style.display = ''; searchSec.style.display = 'none'; return;
+  }
+  roomSec.style.display = 'none'; searchSec.style.display = '';
+
+  let html = '';
+  db.rooms.forEach(room => {
+    (db.items[room.id] || []).forEach(item => {
+      const haystack = [item.name, item.brand, item.serial, item.category, item.notes].join(' ').toLowerCase();
+      if (!haystack.includes(q)) return;
+      const thumbSrc = item.media?.[0]?.type === 'image' ? item.media[0].dataUrl : null;
+      html += `
+        <div class="search-result-item" onclick="jumpToItem('${room.id}','${item.id}')">
+          <div class="search-result-thumb">
+            ${thumbSrc ? `<img src="${thumbSrc}" alt="">` : (item.media?.[0]?.type === 'video' ? '🎬' : '📦')}
+          </div>
+          <div class="search-result-info">
+            <div class="sr-name">${esc(item.name)}</div>
+            <div class="sr-room">${esc(room.name)}</div>
+            ${item.value ? `<div class="sr-val">$${fmt(item.value)}</div>` : ''}
+          </div>
+        </div>
+      `;
+    });
+  });
+  list.innerHTML = html || '<div class="empty-state"><span class="empty-state-icon">🔍</span><div class="empty-state-text">No items found.</div></div>';
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  doSearch('');
+}
+
+function jumpToItem(roomId, itemId) {
+  clearSearch();
+  currentRoomId = roomId;
+  const room = db.rooms.find(r => r.id === roomId);
+  document.getElementById('items-header-icon').textContent = room?.icon || '';
+  document.getElementById('items-header-title').textContent = room?.name || '';
+  renderItems();
+  showView('view-items');
+  setTimeout(() => openItemDetail(itemId), 80);
+}
+
+// ═══════════════════════════════════════════════════
+//  REPORT
+// ═══════════════════════════════════════════════════
+
+function renderReport() {
+  let grandTotal = 0;
+  let html = `<div class="report-title">📋 Insurance Report</div>`;
+
+  db.rooms.forEach(room => {
+    const items = (db.items[room.id] || []);
+    if (!items.length) return;
+    let roomTotal = 0;
+    const rows = items.map(item => {
+      const val = parseFloat(item.value) || 0;
+      roomTotal += val;
+      return `
+        <div class="report-item-row">
+          <div>
+            <div class="report-item-name">${esc(item.name)}</div>
+            ${item.brand ? `<div class="report-item-brand">${esc(item.brand)}</div>` : ''}
+          </div>
+          <div class="report-item-val">$${fmt(val)}</div>
+        </div>
+      `;
+    }).join('');
+    grandTotal += roomTotal;
+    html += `
+      <div class="report-room-block">
+        <div class="report-room-head">${room.icon} ${esc(room.name)}</div>
+        ${rows}
+        <div class="report-room-total">Room subtotal: <strong>$${fmt(roomTotal)}</strong></div>
+      </div>
+    `;
+  });
+
+  html += `
+    <div class="report-grand-total">
+      <span class="report-grand-label">Grand Total</span>
+      <span class="report-grand-value">$${fmt(grandTotal)}</span>
+    </div>
+    <div class="report-date">Generated ${new Date().toLocaleDateString()} — For insurance documentation purposes.</div>
+  `;
+  document.getElementById('report-body').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════════════════
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close modals on backdrop tap
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// Close lightbox on backdrop
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+});
+
+// ═══════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmt(n) {
+  return parseFloat(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+loadDb();
+renderRooms();
+</script>
+</body>
+</html>
