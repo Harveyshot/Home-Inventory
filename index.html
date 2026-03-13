@@ -733,34 +733,74 @@
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   /* ═══════════════════════════════════
-     SYNC TOOLBAR
+     FILE DROPDOWN MENU
   ═══════════════════════════════════ */
-  .sync-toolbar {
+  .file-toolbar {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: var(--blue-xpale);
-    border-bottom: 1px solid var(--blue-pale);
+    padding: 8px 20px;
+    background: var(--bg-shell);
+    border-bottom: 2px solid var(--border-card, #cdd6e0);
   }
-  .btn-sync {
-    padding: 7px 16px;
-    background: var(--blue-mid);
+  .file-menu-wrap { position: relative; }
+  .btn-file {
+    padding: 7px 18px;
+    background: var(--btn-dark, #444);
     color: #fff;
     border: none;
     border-radius: var(--radius-btn);
     font-family: var(--font-ui);
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     font-weight: 700;
     cursor: pointer;
+    letter-spacing: 0.2px;
     transition: background 0.15s;
-    white-space: nowrap;
   }
-  .btn-sync:hover { background: var(--blue-header); }
-  .btn-sync-report { background: var(--peach-dark); }
-  .btn-sync-report:hover { background: var(--peach-mid); }
-  .sync-divider { flex: 1; }
-  .sync-status { font-size: 0.75rem; color: var(--text-muted); font-style: italic; }
+  .btn-file:hover { background: var(--btn-hover, #333); }
+  .file-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: var(--bg-white);
+    border: 1.5px solid var(--blue-pale);
+    border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(20,50,120,0.18);
+    min-width: 200px;
+    z-index: 150;
+    overflow: hidden;
+    animation: dropIn 0.15s ease;
+  }
+  .file-dropdown.open { display: block; }
+  @keyframes dropIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .file-menu-item {
+    display: block; width: 100%;
+    padding: 12px 18px;
+    background: none; border: none;
+    text-align: left;
+    font-family: var(--font-ui); font-size: 0.9rem; font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .file-menu-item:hover { background: var(--blue-xpale); color: var(--blue-header); }
+  .file-menu-divider {
+    height: 1px; background: var(--blue-pale); margin: 2px 0;
+  }
+
+  /* ═══════════════════════════════════
+     INSTRUCTIONS MODAL
+  ═══════════════════════════════════ */
+  .instr-section { margin-bottom: 16px; }
+  .instr-heading {
+    font-size: 0.92rem; font-weight: 700;
+    color: var(--blue-header); margin-bottom: 5px;
+  }
+  .instr-text {
+    font-size: 0.86rem; color: var(--text-main);
+    line-height: 1.6; background: var(--blue-xpale);
+    border-radius: 8px; padding: 10px 12px;
+  }
 
   /* Receipt badge */
   .receipt-badge {
@@ -790,13 +830,20 @@
       </div>
       <button class="btn-clear-search" onclick="clearSearch()">Clear</button>
     </div>
-    <!-- Sync / Backup toolbar -->
-    <div class="sync-toolbar">
-      <button class="btn-sync" onclick="exportBackup()" title="Export backup file">⬆ Export</button>
-      <button class="btn-sync" onclick="document.getElementById('import-file-input').click()" title="Import backup file">⬇ Import</button>
+    <!-- File dropdown menu -->
+    <div class="file-toolbar">
+      <div class="file-menu-wrap">
+        <button class="btn-file" onclick="toggleFileMenu(event)">File ▾</button>
+        <div class="file-dropdown" id="file-dropdown">
+          <button class="file-menu-item" onclick="exportBackup(); closeFileMenu()">⬆ Export Backup</button>
+          <button class="file-menu-item" onclick="document.getElementById('import-file-input').click(); closeFileMenu()">⬇ Import Backup</button>
+          <div class="file-menu-divider"></div>
+          <button class="file-menu-item" onclick="showView('view-report'); closeFileMenu()">📋 Insurance Report</button>
+          <div class="file-menu-divider"></div>
+          <button class="file-menu-item" onclick="showInstructions(); closeFileMenu()">📖 Instructions</button>
+        </div>
+      </div>
       <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="importBackup(this)">
-      <div class="sync-divider"></div>
-      <button class="btn-sync btn-sync-report" onclick="showView('view-report')" title="Insurance report">📋 Report</button>
     </div>
     <div id="rooms-section">
       <div class="rooms-header-row">
@@ -823,8 +870,7 @@
       <button class="back-btn" onclick="navBack('view-rooms')">← Rooms</button>
       <span class="view-header-icon" id="items-header-icon"></span>
       <span class="view-header-title" id="items-header-title"></span>
-      <button class="btn-peach" onclick="showView('view-report')" style="margin-left:auto; font-size:0.82rem; padding:8px 14px;">📋 Report</button>
-      <button class="btn-blue" onclick="showAddItemModal(null)" style="font-size:0.82rem; padding:8px 14px;">+ Item</button>
+      <button class="btn-blue" onclick="showAddItemModal(null)" style="margin-left:auto; font-size:0.82rem; padding:8px 14px;">+ Item</button>
     </div>
     <div class="items-body">
       <div class="items-grid" id="items-grid"></div>
@@ -967,6 +1013,59 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('modal-item')">Cancel</button>
       <button class="btn-modal-save" onclick="saveItem()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL: INSTRUCTIONS ══════ -->
+<div class="modal-overlay" id="modal-instructions">
+  <div class="modal-sheet">
+    <div class="modal-handle" onclick="closeModal('modal-instructions')"></div>
+    <div class="modal-title">📖 How to Use Home Inventory</div>
+
+    <div class="instr-section">
+      <div class="instr-heading">🏠 Rooms</div>
+      <div class="instr-text">Tap a room card to open it and view its items. Use <strong>+ Add Room</strong> to create a new room — choose a name and icon. Tap the <strong>✕</strong> on any room card to delete it and all its items.</div>
+    </div>
+
+    <div class="instr-section">
+      <div class="instr-heading">📦 Adding Items</div>
+      <div class="instr-text">Open a room then tap <strong>+ Item</strong>. Fill in the item name (required), plus optional details like value, brand, serial number, and purchase date. These details appear in your insurance report.</div>
+    </div>
+
+    <div class="instr-section">
+      <div class="instr-heading">📷 Photos, Videos &amp; Receipts</div>
+      <div class="instr-text">When adding an item, tap <strong>Photo Library</strong> to pick existing photos or videos, or use <strong>Take Photo</strong> / <strong>Record Video</strong> to capture new media directly. Add receipt photos in the <strong>Receipts</strong> section — they'll be tagged with an orange RECEIPT badge. All images are automatically compressed to save storage.</div>
+    </div>
+
+    <div class="instr-section">
+      <div class="instr-heading">📋 Insurance Report</div>
+      <div class="instr-text">Go to <strong>File ▾ → Insurance Report</strong>. Check or uncheck rooms to include. Tap <strong>🖨 Print / PDF</strong> to open a print-ready report. On iPhone: tap the Share icon → Save as PDF. On PC: use the browser print dialog → Save as PDF.</div>
+    </div>
+
+    <div class="instr-section">
+      <div class="instr-heading">☁️ Syncing Between Devices</div>
+      <div class="instr-text">
+        To move your data between iPhone and PC:<br>
+        1. On the source device tap <strong>File ▾ → Export Backup</strong><br>
+        2. Save the file to <strong>iCloud Drive</strong>, <strong>Google Drive</strong>, or email it to yourself<br>
+        3. On the other device tap <strong>File ▾ → Import Backup</strong> and select the file<br>
+        Your rooms, items, photos and receipts will all transfer.
+      </div>
+    </div>
+
+    <div class="instr-section">
+      <div class="instr-heading">🔍 Search</div>
+      <div class="instr-text">Use the search bar at the top to find items across all rooms by name, brand, serial number, category or notes. Tap a result to jump straight to that item.</div>
+    </div>
+
+    <div class="instr-section">
+      <div class="instr-heading">💾 Your Data</div>
+      <div class="instr-text">All data is stored locally on your device using IndexedDB. It is never sent anywhere. <strong>Export a backup regularly</strong> to avoid losing data if you clear your browser or reinstall the app.</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-save" onclick="closeModal('modal-instructions')">Got it!</button>
     </div>
   </div>
 </div>
@@ -1746,6 +1845,24 @@ function showToast(msg) {
   t.textContent = msg; t.classList.add('show');
   clearTimeout(t._tid);
   t._tid = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════
+//  FILE MENU
+// ═══════════════════════════════════════════════════
+
+function toggleFileMenu(e) {
+  e.stopPropagation();
+  document.getElementById('file-dropdown').classList.toggle('open');
+}
+function closeFileMenu() {
+  document.getElementById('file-dropdown').classList.remove('open');
+}
+// Close dropdown when clicking anywhere else
+document.addEventListener('click', () => closeFileMenu());
+
+function showInstructions() {
+  openModal('modal-instructions');
 }
 
 // ═══════════════════════════════════════════════════
