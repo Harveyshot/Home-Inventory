@@ -806,6 +806,16 @@
       <button class="back-btn" onclick="navBack('view-rooms')">← Rooms</button>
       <span class="view-header-title">Insurance Report</span>
     </div>
+    <!-- Room filter -->
+    <div style="padding:12px 20px 0; background:var(--bg-shell); border-bottom:1px solid var(--blue-pale);">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Include Rooms</div>
+      <div id="report-room-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;padding-bottom:12px;"></div>
+      <div style="display:flex;gap:8px;padding-bottom:12px;">
+        <button class="btn-blue" style="font-size:0.8rem;padding:6px 14px;" onclick="selectAllRooms(true)">All</button>
+        <button class="btn-grey" style="font-size:0.8rem;padding:6px 14px;" onclick="selectAllRooms(false)">None</button>
+        <button class="btn-peach" style="margin-left:auto;font-size:0.8rem;padding:6px 16px;" onclick="printReport()">🖨 Print / PDF</button>
+      </div>
+    </div>
     <div class="report-body" id="report-body"></div>
   </div>
 
@@ -877,11 +887,22 @@
     </div>
     <div class="form-group">
       <label class="form-label">Photos &amp; Videos</label>
-      <div class="upload-zone" onclick="document.getElementById('file-input-hidden').click()">
+      <label class="upload-zone" for="file-input-hidden">
         <span class="upload-zone-icon">📷</span>
-        Tap to add photos or videos
+        Tap to choose from Photo Library
+      </label>
+      <input type="file" id="file-input-hidden" accept="image/*,video/*" multiple onchange="handleFileSelect(this)" style="display:none">
+      <!-- iPhone camera direct capture buttons -->
+      <div style="display:flex; gap:8px; margin-bottom:10px;">
+        <label class="upload-zone" for="file-input-camera" style="flex:1; margin-bottom:0; font-size:0.82rem; padding:10px 8px;">
+          <span style="font-size:1.3rem; display:block; margin-bottom:3px;">📸</span>Take Photo
+        </label>
+        <input type="file" id="file-input-camera" accept="image/*" capture="environment" onchange="handleFileSelect(this)" style="display:none">
+        <label class="upload-zone" for="file-input-video" style="flex:1; margin-bottom:0; font-size:0.82rem; padding:10px 8px;">
+          <span style="font-size:1.3rem; display:block; margin-bottom:3px;">🎬</span>Record Video
+        </label>
+        <input type="file" id="file-input-video" accept="video/*" capture="environment" onchange="handleFileSelect(this)" style="display:none">
       </div>
-      <input type="file" id="file-input-hidden" accept="image/*,video/*" multiple onchange="handleFileSelect(this)">
       <div class="media-preview-row" id="media-preview-row"></div>
     </div>
     <div class="modal-actions">
@@ -907,36 +928,124 @@
 
 <script>
 // ═══════════════════════════════════════════════════
-//  DATA & STORAGE
+//  DATA & STORAGE — IndexedDB (reliable on iOS Safari)
 // ═══════════════════════════════════════════════════
 
 const ROOM_ICONS = ['🛋️','🛏️','🛁','🍳','🚗','📦','💼','🖥️','🌿','🎮','🧺','🔧','📚','🏋️','🎨','🚿','🍽️','🏠'];
 
 const DEFAULT_ROOMS = [
-  { id: genId(), name: 'Living Room', icon: '🛋️' },
-  { id: genId(), name: 'Bedroom 1',   icon: '🛏️' },
-  { id: genId(), name: 'Bedroom 2',   icon: '🛏️' },
-  { id: genId(), name: 'Garage',      icon: '🚗' },
+  { name: 'Living Room', icon: '🛋️' },
+  { name: 'Bedroom 1',   icon: '🛏️' },
+  { name: 'Bedroom 2',   icon: '🛏️' },
+  { name: 'Garage',      icon: '🚗' },
 ];
 
 let db = { rooms: [], items: {} };
+let idbDb = null;
 
 function genId() { return 'id_' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
 
-function loadDb() {
+// Open IndexedDB
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('HomeInventoryDB', 1);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('data')) {
+        d.createObjectStore('data', { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror   = e => reject(e);
+  });
+}
+
+function idbGet(key) {
+  return new Promise((resolve, reject) => {
+    const tx = idbDb.transaction('data', 'readonly');
+    const req = tx.objectStore('data').get(key);
+    req.onsuccess = e => resolve(e.target.result?.value ?? null);
+    req.onerror   = e => reject(e);
+  });
+}
+
+function idbSet(key, value) {
+  return new Promise((resolve, reject) => {
+    const tx = idbDb.transaction('data', 'readwrite');
+    const req = tx.objectStore('data').put({ key, value });
+    req.onsuccess = () => resolve();
+    req.onerror   = e => reject(e);
+  });
+}
+
+async function loadDb() {
   try {
-    const raw = localStorage.getItem('hi_db_v2');
-    if (raw) { db = JSON.parse(raw); return; }
-  } catch(e) {}
-  // First run
+    idbDb = await openIDB();
+    const saved = await idbGet('hi_db');
+    if (saved) {
+      db = saved;
+      return;
+    }
+  } catch(e) {
+    console.warn('IndexedDB failed, falling back to localStorage', e);
+    // Fallback to localStorage
+    try {
+      const raw = localStorage.getItem('hi_db_v2');
+      if (raw) { db = JSON.parse(raw); return; }
+    } catch(e2) {}
+  }
+  // First run — set up defaults
   db.rooms = DEFAULT_ROOMS.map(r => ({ ...r, id: genId() }));
   db.rooms.forEach(r => { db.items[r.id] = []; });
-  saveDb();
+  await saveDb();
 }
-function saveDb() {
-  try { localStorage.setItem('hi_db_v2', JSON.stringify(db)); } catch(e) {
-    showToast('Storage full — try removing some media.');
+
+async function saveDb() {
+  try {
+    if (idbDb) {
+      await idbSet('hi_db', db);
+    } else {
+      localStorage.setItem('hi_db_v2', JSON.stringify(db));
+    }
+  } catch(e) {
+    showToast('Storage error — try removing some large photos.');
+    console.error('Save failed:', e);
   }
+}
+
+// ═══════════════════════════════════════════════════
+//  IMAGE COMPRESSION & VIDEO HANDLING
+// ═══════════════════════════════════════════════════
+
+// Compress image to max 1200px wide, 0.75 quality JPEG
+function compressImage(dataUrl, maxSize = 1200, quality = 0.75) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxSize || height > maxSize) {
+        if (width > height) { height = Math.round(height * maxSize / width); width = maxSize; }
+        else { width = Math.round(width * maxSize / height); height = maxSize; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+}
+
+// Compress video by capping at a lower resolution via canvas snapshot (thumbnail only stored)
+// Full video stored but warn if > 50MB
+function handleVideo(dataUrl, file) {
+  return new Promise(resolve => {
+    const sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > 50) {
+      showToast(`Video is ${sizeMB.toFixed(0)}MB — may be too large to save.`);
+    }
+    resolve(dataUrl);
+  });
 }
 
 // ═══════════════════════════════════════════════════
@@ -1129,8 +1238,16 @@ function handleFileSelect(input) {
   files.forEach(file => {
     const isVideo = file.type.startsWith('video/');
     const reader = new FileReader();
-    reader.onload = e => {
-      pendingMedia.push({ type: isVideo ? 'video' : 'image', dataUrl: e.target.result });
+    reader.onload = async e => {
+      let dataUrl = e.target.result;
+      if (isVideo) {
+        dataUrl = await handleVideo(dataUrl, file);
+        pendingMedia.push({ type: 'video', dataUrl });
+      } else {
+        showToast('Compressing image...');
+        dataUrl = await compressImage(dataUrl);
+        pendingMedia.push({ type: 'image', dataUrl });
+      }
       renderMediaPreviews();
     };
     reader.readAsDataURL(file);
@@ -1366,10 +1483,42 @@ function jumpToItem(roomId, itemId) {
 // ═══════════════════════════════════════════════════
 
 function renderReport() {
+  // Build room checkboxes
+  const cbContainer = document.getElementById('report-room-checkboxes');
+  cbContainer.innerHTML = '';
+  db.rooms.forEach(room => {
+    const items = db.items[room.id] || [];
+    if (!items.length) return;
+    const lbl = document.createElement('label');
+    lbl.style.cssText = 'display:flex;align-items:center;gap:5px;background:var(--blue-xpale);border:1.5px solid var(--blue-pale);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--blue-header);user-select:none;';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = true;
+    cb.dataset.roomId = room.id;
+    cb.style.accentColor = 'var(--blue-mid)';
+    cb.onchange = buildReport;
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(` ${room.icon} ${room.name} (${items.length})`));
+    cbContainer.appendChild(lbl);
+  });
+  buildReport();
+}
+
+function selectAllRooms(checked) {
+  document.querySelectorAll('#report-room-checkboxes input[type=checkbox]').forEach(cb => cb.checked = checked);
+  buildReport();
+}
+
+function buildReport() {
+  const selectedIds = new Set(
+    Array.from(document.querySelectorAll('#report-room-checkboxes input[type=checkbox]'))
+      .filter(cb => cb.checked).map(cb => cb.dataset.roomId)
+  );
+
   let grandTotal = 0;
-  let html = `<div class="report-title">📋 Insurance Report</div>`;
+  let html = '';
 
   db.rooms.forEach(room => {
+    if (!selectedIds.has(room.id)) return;
     const items = (db.items[room.id] || []);
     if (!items.length) return;
     let roomTotal = 0;
@@ -1380,7 +1529,8 @@ function renderReport() {
         <div class="report-item-row">
           <div>
             <div class="report-item-name">${esc(item.name)}</div>
-            ${item.brand ? `<div class="report-item-brand">${esc(item.brand)}</div>` : ''}
+            ${item.brand  ? `<div class="report-item-brand">${esc(item.brand)}</div>` : ''}
+            ${item.serial ? `<div class="report-item-brand">S/N: ${esc(item.serial)}</div>` : ''}
           </div>
           <div class="report-item-val">$${fmt(val)}</div>
         </div>
@@ -1396,14 +1546,91 @@ function renderReport() {
     `;
   });
 
-  html += `
-    <div class="report-grand-total">
-      <span class="report-grand-label">Grand Total</span>
-      <span class="report-grand-value">$${fmt(grandTotal)}</span>
-    </div>
-    <div class="report-date">Generated ${new Date().toLocaleDateString()} — For insurance documentation purposes.</div>
-  `;
+  if (!html) {
+    html = '<div class="empty-state"><span class="empty-state-icon">📋</span><div class="empty-state-text">No rooms selected or no items to report.</div></div>';
+  } else {
+    html += `
+      <div class="report-grand-total">
+        <span class="report-grand-label">Grand Total</span>
+        <span class="report-grand-value">$${fmt(grandTotal)}</span>
+      </div>
+      <div class="report-date">Generated ${new Date().toLocaleDateString()} — For insurance documentation purposes.</div>
+    `;
+  }
   document.getElementById('report-body').innerHTML = html;
+}
+
+function printReport() {
+  const selectedIds = new Set(
+    Array.from(document.querySelectorAll('#report-room-checkboxes input[type=checkbox]'))
+      .filter(cb => cb.checked).map(cb => cb.dataset.roomId)
+  );
+
+  let grandTotal = 0;
+  let roomsHtml = '';
+
+  db.rooms.forEach(room => {
+    if (!selectedIds.has(room.id)) return;
+    const items = (db.items[room.id] || []);
+    if (!items.length) return;
+    let roomTotal = 0;
+    const rows = items.map(item => {
+      const val = parseFloat(item.value) || 0;
+      roomTotal += val;
+      return `<tr>
+        <td style="padding:7px 10px;border-bottom:1px solid #eee;">${esc(item.name)}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid #eee;color:#666;">${esc(item.brand||'')}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid #eee;color:#666;">${esc(item.serial||'')}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid #eee;color:#666;">${esc(item.category||'')}</td>
+        <td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right;font-weight:700;color:#c96a40;">$${fmt(val)}</td>
+      </tr>`;
+    }).join('');
+    grandTotal += roomTotal;
+    roomsHtml += `
+      <div style="margin-bottom:24px;">
+        <div style="background:#dbeaf8;padding:8px 12px;border-radius:6px;font-weight:700;font-size:1rem;color:#1a4f96;margin-bottom:8px;">${room.icon} ${esc(room.name)}</div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
+          <thead>
+            <tr style="background:#f0f6ff;">
+              <th style="padding:6px 10px;text-align:left;color:#1a4f96;font-size:0.75rem;text-transform:uppercase;">Item</th>
+              <th style="padding:6px 10px;text-align:left;color:#1a4f96;font-size:0.75rem;text-transform:uppercase;">Brand</th>
+              <th style="padding:6px 10px;text-align:left;color:#1a4f96;font-size:0.75rem;text-transform:uppercase;">Serial</th>
+              <th style="padding:6px 10px;text-align:left;color:#1a4f96;font-size:0.75rem;text-transform:uppercase;">Category</th>
+              <th style="padding:6px 10px;text-align:right;color:#1a4f96;font-size:0.75rem;text-transform:uppercase;">Value</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div style="text-align:right;font-size:0.82rem;color:#666;margin-top:6px;">Room subtotal: <strong>$${fmt(roomTotal)}</strong></div>
+      </div>
+    `;
+  });
+
+  const printWin = window.open('', '_blank');
+  printWin.document.write(`<!DOCTYPE html><html><head>
+    <title>Home Inventory — Insurance Report</title>
+    <meta charset="UTF-8">
+    <style>
+      body { font-family: Georgia, serif; padding: 40px; color: #1a2a3a; max-width: 900px; margin: 0 auto; }
+      @media print { body { padding: 20px; } .no-print { display: none; } }
+    </style>
+  </head><body>
+    <div style="text-align:center;margin-bottom:30px;border-bottom:2px solid #dbeaf8;padding-bottom:20px;">
+      <div style="font-size:2rem;font-weight:700;color:#1a4f96;margin-bottom:4px;">Home Inventory</div>
+      <div style="font-size:1rem;color:#666;">Insurance Documentation Report</div>
+      <div style="font-size:0.82rem;color:#999;margin-top:4px;">Generated ${new Date().toLocaleDateString()}</div>
+    </div>
+    ${roomsHtml}
+    <div style="margin-top:30px;padding:16px;background:#fef7f2;border:2px solid #f4c4a8;border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:1.1rem;font-weight:700;color:#1a4f96;">Grand Total</span>
+      <span style="font-size:1.3rem;font-weight:700;color:#c96a40;">$${fmt(grandTotal)}</span>
+    </div>
+    <div style="margin-top:20px;text-align:center;" class="no-print">
+      <button onclick="window.print()" style="background:#1a4f96;color:white;border:none;padding:12px 30px;border-radius:8px;font-size:1rem;cursor:pointer;">🖨 Print / Save as PDF</button>
+    </div>
+  </body></html>`);
+  printWin.document.close();
+  printWin.focus();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1444,8 +1671,7 @@ function showToast(msg) {
 // ═══════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════
-loadDb();
-renderRooms();
+loadDb().then(() => renderRooms());
 </script>
 </body>
 </html>
