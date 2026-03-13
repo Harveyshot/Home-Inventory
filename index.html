@@ -731,6 +731,45 @@
     box-shadow: 0 4px 16px rgba(20,60,130,0.25);
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ═══════════════════════════════════
+     SYNC TOOLBAR
+  ═══════════════════════════════════ */
+  .sync-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--blue-xpale);
+    border-bottom: 1px solid var(--blue-pale);
+  }
+  .btn-sync {
+    padding: 7px 16px;
+    background: var(--blue-mid);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-btn);
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-sync:hover { background: var(--blue-header); }
+  .btn-sync-report { background: var(--peach-dark); }
+  .btn-sync-report:hover { background: var(--peach-mid); }
+  .sync-divider { flex: 1; }
+  .sync-status { font-size: 0.75rem; color: var(--text-muted); font-style: italic; }
+
+  /* Receipt badge */
+  .receipt-badge {
+    position: absolute; bottom: 4px; left: 4px;
+    background: var(--peach-dark); color: #fff;
+    font-size: 0.6rem; font-weight: 700;
+    padding: 1px 5px; border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
 </style>
 </head>
 <body>
@@ -750,6 +789,14 @@
         <input class="search-input" id="search-input" placeholder="Search items..." oninput="doSearch(this.value)">
       </div>
       <button class="btn-clear-search" onclick="clearSearch()">Clear</button>
+    </div>
+    <!-- Sync / Backup toolbar -->
+    <div class="sync-toolbar">
+      <button class="btn-sync" onclick="exportBackup()" title="Export backup file">⬆ Export</button>
+      <button class="btn-sync" onclick="document.getElementById('import-file-input').click()" title="Import backup file">⬇ Import</button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="importBackup(this)">
+      <div class="sync-divider"></div>
+      <button class="btn-sync btn-sync-report" onclick="showView('view-report')" title="Insurance report">📋 Report</button>
     </div>
     <div id="rooms-section">
       <div class="rooms-header-row">
@@ -891,19 +938,31 @@
         <span class="upload-zone-icon">📷</span>
         Tap to choose from Photo Library
       </label>
-      <input type="file" id="file-input-hidden" accept="image/*,video/*" multiple onchange="handleFileSelect(this)" style="display:none">
-      <!-- iPhone camera direct capture buttons -->
+      <input type="file" id="file-input-hidden" accept="image/*,video/*" multiple onchange="handleFileSelect(this,'media')" style="display:none">
       <div style="display:flex; gap:8px; margin-bottom:10px;">
         <label class="upload-zone" for="file-input-camera" style="flex:1; margin-bottom:0; font-size:0.82rem; padding:10px 8px;">
           <span style="font-size:1.3rem; display:block; margin-bottom:3px;">📸</span>Take Photo
         </label>
-        <input type="file" id="file-input-camera" accept="image/*" capture="environment" onchange="handleFileSelect(this)" style="display:none">
+        <input type="file" id="file-input-camera" accept="image/*" capture="environment" onchange="handleFileSelect(this,'media')" style="display:none">
         <label class="upload-zone" for="file-input-video" style="flex:1; margin-bottom:0; font-size:0.82rem; padding:10px 8px;">
           <span style="font-size:1.3rem; display:block; margin-bottom:3px;">🎬</span>Record Video
         </label>
-        <input type="file" id="file-input-video" accept="video/*" capture="environment" onchange="handleFileSelect(this)" style="display:none">
+        <input type="file" id="file-input-video" accept="video/*" capture="environment" onchange="handleFileSelect(this,'media')" style="display:none">
       </div>
       <div class="media-preview-row" id="media-preview-row"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Receipts</label>
+      <label class="upload-zone" for="file-input-receipt" style="border-color:var(--peach-light);background:var(--peach-xpale);color:var(--peach-dark);">
+        <span class="upload-zone-icon">🧾</span>
+        Tap to add receipt photos
+      </label>
+      <input type="file" id="file-input-receipt" accept="image/*" multiple onchange="handleFileSelect(this,'receipt')" style="display:none">
+      <label class="upload-zone" for="file-input-receipt-camera" style="border-color:var(--peach-light);background:var(--peach-xpale);color:var(--peach-dark);font-size:0.82rem;padding:8px;margin-bottom:10px;">
+        <span style="font-size:1.1rem;">📸</span> Take Receipt Photo
+      </label>
+      <input type="file" id="file-input-receipt-camera" accept="image/*" capture="environment" onchange="handleFileSelect(this,'receipt')" style="display:none">
+      <div class="media-preview-row" id="receipt-preview-row"></div>
     </div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('modal-item')">Cancel</button>
@@ -1228,12 +1287,12 @@ function showAddItemModal(itemId) {
   document.getElementById('item-date-input').value   = item?.date     || '';
   document.getElementById('item-notes-input').value  = item?.notes    || '';
 
-  if (item?.media) { pendingMedia = [...item.media]; }
+  if (item?.media) { pendingMedia = item.media.map(m => ({ ...m, tag: m.tag || 'media' })); }
   renderMediaPreviews();
   openModal('modal-item');
 }
 
-function handleFileSelect(input) {
+function handleFileSelect(input, mediaType) {
   const files = Array.from(input.files);
   files.forEach(file => {
     const isVideo = file.type.startsWith('video/');
@@ -1242,11 +1301,11 @@ function handleFileSelect(input) {
       let dataUrl = e.target.result;
       if (isVideo) {
         dataUrl = await handleVideo(dataUrl, file);
-        pendingMedia.push({ type: 'video', dataUrl });
+        pendingMedia.push({ type: 'video', dataUrl, tag: mediaType });
       } else {
         showToast('Compressing image...');
         dataUrl = await compressImage(dataUrl);
-        pendingMedia.push({ type: 'image', dataUrl });
+        pendingMedia.push({ type: 'image', dataUrl, tag: mediaType || 'media' });
       }
       renderMediaPreviews();
     };
@@ -1256,15 +1315,29 @@ function handleFileSelect(input) {
 }
 
 function renderMediaPreviews() {
-  const row = document.getElementById('media-preview-row');
-  row.innerHTML = '';
+  const mediaRow   = document.getElementById('media-preview-row');
+  const receiptRow = document.getElementById('receipt-preview-row');
+  if (mediaRow)   mediaRow.innerHTML = '';
+  if (receiptRow) receiptRow.innerHTML = '';
+
   pendingMedia.forEach((m, i) => {
+    const isReceipt = m.tag === 'receipt';
+    const row = isReceipt ? receiptRow : mediaRow;
+    if (!row) return;
+
     const wrap = document.createElement('div');
     wrap.className = 'media-prev-item';
+    wrap.style.position = 'relative';
     if (m.type === 'video') {
       wrap.innerHTML = `<video src="${m.dataUrl}" muted playsinline></video><div class="vid-overlay">🎬</div>`;
     } else {
       wrap.innerHTML = `<img src="${m.dataUrl}" alt="">`;
+    }
+    if (isReceipt) {
+      const badge = document.createElement('span');
+      badge.className = 'receipt-badge';
+      badge.textContent = 'RECEIPT';
+      wrap.appendChild(badge);
     }
     const delBtn = document.createElement('button');
     delBtn.className = 'media-prev-del';
@@ -1343,10 +1416,17 @@ function renderItemDetail(item) {
     item.media.forEach((m, idx) => {
       const el = document.createElement('div');
       el.className = 'detail-media-item';
+      el.style.position = 'relative';
       if (m.type === 'video') {
         el.innerHTML = `<video src="${m.dataUrl}" muted></video><span class="video-play">▶</span>`;
       } else {
         el.innerHTML = `<img src="${m.dataUrl}" alt="">`;
+      }
+      if (m.tag === 'receipt') {
+        const badge = document.createElement('span');
+        badge.className = 'receipt-badge';
+        badge.textContent = 'RECEIPT';
+        el.appendChild(badge);
       }
       el.onclick = () => openLightbox(item.media, idx);
       scroller.appendChild(el);
@@ -1666,6 +1746,57 @@ function showToast(msg) {
   t.textContent = msg; t.classList.add('show');
   clearTimeout(t._tid);
   t._tid = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════
+//  EXPORT / IMPORT / SYNC
+// ═══════════════════════════════════════════════════
+
+function exportBackup() {
+  const exportData = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    appName: 'HomeInventory',
+    db
+  };
+  const json = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const date = new Date().toISOString().slice(0,10);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `HomeInventory-backup-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✅ Backup exported! Save it to iCloud/Google Drive to sync.');
+}
+
+function importBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!confirm('Import this backup? Your current data will be replaced.')) {
+    input.value = ''; return;
+  }
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      // Support both raw db and wrapped export format
+      const importedDb = parsed.appName === 'HomeInventory' ? parsed.db : parsed;
+      if (!importedDb.rooms || !importedDb.items) throw new Error('Invalid backup file');
+      db = importedDb;
+      await saveDb();
+      renderRooms();
+      showView('view-rooms');
+      showToast(`✅ Imported ${db.rooms.length} rooms successfully!`);
+    } catch(err) {
+      showToast('❌ Invalid backup file — please use a HomeInventory export.');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
 }
 
 // ═══════════════════════════════════════════════════
