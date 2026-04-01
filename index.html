@@ -9,6 +9,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#5b8fc9">
 <title>Home Inventory</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -861,7 +863,9 @@
     <div class="app-footer">
       <p>Store photos and videos of your belongings for insurance purposes</p>
       <p>All data is stored locally on your device</p>
+	  <p>© Copyright 2026 Phillip Nuckols.</p>
     </div>
+	
   </div>
 
   <!-- ══════ VIEW: ITEMS ══════ -->
@@ -1070,6 +1074,8 @@
   </div>
 </div>
 
+
+
 <!-- ══════ LIGHTBOX ══════ -->
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
@@ -1083,6 +1089,7 @@
 </div>
 
 <div id="toast"></div>
+
 
 <script>
 // ═══════════════════════════════════════════════════
@@ -1921,5 +1928,6 @@ function importBackup(input) {
 // ═══════════════════════════════════════════════════
 loadDb().then(() => renderRooms());
 </script>
+
 </body>
 </html>
