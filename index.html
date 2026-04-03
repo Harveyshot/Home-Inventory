@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#5b8fc9">
 <title>Home Inventory</title>
-<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/x-icon" href="apple-touch-icon-180x180.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -21,11 +21,12 @@
     --shell-border:  #2563a8;
 
     /* Blues */
-    --blue-header:   #1a4f96;
-    --blue-mid:      #2563a8;
-    --blue-light:    #6fa3d8;
-    --blue-pale:     #dbeaf8;
-    --blue-xpale:    #eef5fc;
+    --blue-header:   #4285f4;
+--blue-mid:      #4285f4;
+--blue-light:    #a8c8fb;
+--blue-pale:     #d4e5fd;
+--blue-xpale:    #eef4fe;
+--shell-border:  #4285f4;
 
     /* Peaches — for icon circles */
     --peach-circle:  #eeaa80;
@@ -98,16 +99,18 @@
     gap: 12px;
     margin-bottom: 4px;
   }
-  .logo-circle {
+.logo-circle {
     width: 58px; height: 58px;
     border-radius: 50%;
-    border: 2.5px solid var(--blue-mid);
+    border: 3.5px solid var(--blue-mid);
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-display);
-    font-size: 28px; font-weight: 700;
-    color: var(--blue-header);
-    letter-spacing: 2px;
-    background: var(--peach-circle);
+    font-size: 35px; font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0;
+    line-height: 1;
+    background: var(--bg-shell);
+	padding-bottom: 3px;
     flex-shrink: 0;
   }
   .app-title {
