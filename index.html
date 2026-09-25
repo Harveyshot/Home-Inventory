@@ -9,23 +9,35 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#5b8fc9">
 <title>Home Inventory</title>
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4285f4">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/Home-Inventory/sw.js')
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.log('SW error:', err));
+    });
+  }
+</script>
+<link rel="icon" type="image/x-icon" href="apple-touch-icon-180x180.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Peach/salmon app background — matching screenshot */
-    --bg-app:        #f2b898;
-    --bg-shell:      #fdf6f0;
+    --bg-app:        #ffffff;
+    --bg-shell:      #fdeee4;
     --bg-white:      #ffffff;
     --shell-border:  #2563a8;
 
     /* Blues */
-    --blue-header:   #1a4f96;
-    --blue-mid:      #2563a8;
-    --blue-light:    #6fa3d8;
-    --blue-pale:     #dbeaf8;
-    --blue-xpale:    #eef5fc;
+    --blue-header:   #4285f4;
+--blue-mid:      #4285f4;
+--blue-light:    #a8c8fb;
+--blue-pale:     #d4e5fd;
+--blue-xpale:    #eef4fe;
+--shell-border:  #4285f4;
 
     /* Peaches — for icon circles */
     --peach-circle:  #eeaa80;
@@ -75,7 +87,7 @@
     margin: 0 auto;
     background: var(--bg-shell);
     min-height: calc(100dvh - 40px);
-    border: 2px solid var(--shell-border);
+    border: 3px solid var(--shell-border);
     border-radius: var(--radius-shell);
     overflow: hidden;
     position: relative;
@@ -98,24 +110,26 @@
     gap: 12px;
     margin-bottom: 4px;
   }
-  .logo-circle {
+.logo-circle {
     width: 58px; height: 58px;
     border-radius: 50%;
-    border: 2.5px solid var(--blue-mid);
+    border: 3.5px solid var(--blue-mid);
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-display);
-    font-size: 28px; font-weight: 700;
-    color: var(--blue-header);
-    letter-spacing: 2px;
-    background: var(--peach-circle);
+    font-size: 35px; font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0;
+    line-height: 1;
+    background: var(--bg-shell);
+	padding-bottom: 3px;
     flex-shrink: 0;
   }
- .app-title {
+  .app-title {
     font-family: var(--font-display);
-    font-size: 2.4rem;
+    font-size: 2.1rem;
     font-weight: 700;
-    color: #4285f4;
-    letter-spacing: 0.5px;
+    color: var(--blue-header);
+    letter-spacing: 0.3px;
     display: block;
     margin-top: 2px;
   }
@@ -155,23 +169,8 @@
   }
   .search-input::placeholder { color: var(--text-light); }
   .search-input:focus { border-color: var(--blue-mid); }
-  .btn-clear-search {
-    padding: 10px 20px;
-    background: var(--blue-mid);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-btn);
-    font-family: var(--font-ui);
-    font-size: 0.88rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.15s;
-    white-space: nowrap;
-  }
-  .btn-clear-search:hover { background: var(--blue-header); }
-  /* keep old .btn-grey alias */
-  .btn-grey { padding: 10px 20px; background: var(--blue-mid); color: #fff; border: none; border-radius: var(--radius-btn); font-family: var(--font-ui); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
-  .btn-grey:hover { background: var(--blue-header); }
+  
+
 
   /* ═══════════════════════════════════
      ROOMS SECTION HEADER ROW
@@ -635,11 +634,6 @@
     background: var(--blue-xpale);
     transition: background 0.15s, border-color 0.15s;
     margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
   }
   .upload-zone:hover { background: var(--blue-pale); border-color: var(--blue-mid); }
   .upload-zone-icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
@@ -828,7 +822,7 @@
       <div class="logo-row">
         <div class="logo-circle">HI</div>
       </div>
-      <span class="app-title">Home Inventory</span>
+      <h1 class="app-title">Home Inventory</h1>
     </header>
     <div class="search-row">
       <div class="search-wrap">
@@ -987,22 +981,20 @@
       <label class="form-label">Notes</label>
       <textarea class="form-control" id="item-notes-input" placeholder="Condition, receipt location, warranty info…"></textarea>
     </div>
-    
-    
-      <div class="form-group">
+    <div class="form-group">
       <label class="form-label">Photos &amp; Videos</label>
-      <label class="upload-zone" for="file-input-hidden">
-        <span class="upload-zone-icon">📷</span>
-        Tap to choose from Photo Library
-      </label>
-      <input type="file" id="file-input-hidden" accept="image/*,video/*" multiple onchange="handleFileSelect(this,'media')" style="display:none">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
-        <label class="upload-zone" for="file-input-camera" style="margin-bottom:0; font-size:0.85rem; padding:12px 8px;">
-          <span class="upload-zone-icon" style="font-size:1.4rem;">📸</span>Take Photo
+      <label class="upload-zone" for="file-input-hidden" style="display:block; margin-bottom:0;">
+  <span class="upload-zone-icon">📷</span>
+  Tap to choose from Photo Library
+</label>
+      <input type="file" id="file-input-hidden" accept="image/*,video/*" multiple onchange="handleFileSelect(this,'media')" style="display:none; margin:0; padding:0;">
+<div style="display:flex; gap:8px; margin-bottom:10px;">
+        <label class="upload-zone" for="file-input-camera" style="flex:1; margin-bottom:0; font-size:0.82rem; padding:10px 8px;">
+          <span style="font-size:1.3rem; display:block; margin-bottom:3px;">📸</span>Take Photo
         </label>
         <input type="file" id="file-input-camera" accept="image/*" capture="environment" onchange="handleFileSelect(this,'media')" style="display:none">
-        <label class="upload-zone" for="file-input-video" style="margin-bottom:0; font-size:0.85rem; padding:12px 8px;">
-          <span class="upload-zone-icon" style="font-size:1.4rem;">🎬</span>Record Video
+        <label class="upload-zone" for="file-input-video" style="flex:1; margin-bottom:0; font-size:0.82rem; padding:10px 8px;">
+          <span style="font-size:1.3rem; display:block; margin-bottom:3px;">🎬</span>Record Video
         </label>
         <input type="file" id="file-input-video" accept="video/*" capture="environment" onchange="handleFileSelect(this,'media')" style="display:none">
       </div>
@@ -1015,8 +1007,8 @@
         Tap to add receipt photos
       </label>
       <input type="file" id="file-input-receipt" accept="image/*" multiple onchange="handleFileSelect(this,'receipt')" style="display:none">
-      <label class="upload-zone" for="file-input-receipt-camera" style="border-color:var(--peach-light);background:var(--peach-xpale);color:var(--peach-dark);font-size:0.85rem;padding:12px 8px;margin-bottom:10px;">
-        <span class="upload-zone-icon" style="font-size:1.4rem;">📸</span>Take Receipt Photo
+      <label class="upload-zone" for="file-input-receipt-camera" style="border-color:var(--peach-light);background:var(--peach-xpale);color:var(--peach-dark);font-size:0.82rem;padding:8px;margin-bottom:10px;">
+        <span style="font-size:1.1rem;">📸</span> Take Receipt Photo
       </label>
       <input type="file" id="file-input-receipt-camera" accept="image/*" capture="environment" onchange="handleFileSelect(this,'receipt')" style="display:none">
       <div class="media-preview-row" id="receipt-preview-row"></div>
@@ -1073,18 +1065,6 @@
     <div class="instr-section">
       <div class="instr-heading">💾 Your Data</div>
       <div class="instr-text">All data is stored locally on your device using IndexedDB. It is never sent anywhere. <strong>Export a backup regularly</strong> to avoid losing data if you clear your browser or reinstall the app.</div>
-    </div>
-
-    <<div class="instr-section">
-      <div class="instr-heading">📱 Using on iPhone or Android</div>
-      <div class="instr-text">
-        To use Home Inventory on your phone with full camera access:<br>
-        1. Save this file to <strong>iCloud Drive</strong>, <strong>Google Drive</strong>, or email it to yourself<br>
-        2. Open the file on your phone — use <strong>Safari</strong> on iPhone, <strong>Chrome</strong> on Android<br>
-        3. On iPhone: tap the <strong>Share icon</strong> → <strong>Add to Home Screen</strong><br>
-        &nbsp;&nbsp;&nbsp;On Android: tap the <strong>three-dot menu</strong> → <strong>Add to Home Screen</strong><br>
-        4. The app will appear as an icon and open just like a regular app, with full camera access for photos and receipts.
-      </div>
     </div>
 
     <div class="modal-actions">
