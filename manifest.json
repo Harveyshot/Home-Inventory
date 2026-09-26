@@ -22,9 +22,12 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-	{
-    "display_override": ["window-controls-overlay"],
-    "display": "standalone"
-}
+  ],
+  "screenshots": [
+    {
+      "src": "HI-app-screenshot.png",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
   ]
 }
