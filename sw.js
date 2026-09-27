@@ -1,4 +1,4 @@
-const CACHE_NAME = 'home-inventory-v1';
+const CACHE_NAME = 'home-inventory-v2';
 const urlsToCache = [
   '/Home-Inventory/',
   '/Home-Inventory/index.html',
