@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Home Inventory app for Windows, Mac and iPhone. Catalog your belongings room by room, add photos and serial numbers, export insurance reports. One-time $1.99 purchase, no subscription.">
+<title>Home Inventory App — Track Belongings &amp; Export Insurance Reports | $0.99</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PFBNQ3F5FL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PFBNQ3F5FL');
+</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --yellow: #F4A57A;
+    --coral: #2D6DB5;
+    --navy: #1B3A6B;
+    --white: #FEF0E7;
+    --purple: #E8C4A0;
+    --mint: #5B9BD5;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--navy); overflow-x: hidden; }
+
+  nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; padding: 1.1rem 5%; display: flex; justify-content: space-between; align-items: center; background: var(--white); border-bottom: 2px solid var(--navy); }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem; color: var(--navy); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 11px; height: 11px; background: var(--mint); border-radius: 50%; display: inline-block; }
+  nav ul { list-style: none; display: flex; gap: 2rem; }
+  nav a { text-decoration: none; color: var(--navy); font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
+  nav a:hover { color: var(--coral); }
+  .nav-cta { background: var(--navy); color: var(--white) !important; padding: 0.45rem 1.2rem; border-radius: 100px; }
+  .nav-cta:hover { background: var(--coral) !important; }
+
+  .hero { padding: 120px 5% 70px; background: var(--navy); display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 500px; height: 500px; background: var(--mint); border-radius: 50%; opacity: 0.1; z-index: 0; }
+  .hero-text { position: relative; z-index: 1; }
+  .app-badge { display: inline-flex; align-items: center; gap: 0.6rem; background: rgba(255,255,255,0.1); color: var(--white); font-size: 0.82rem; padding: 0.35rem 1rem; border-radius: 100px; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 1.25rem; animation: fadeUp 0.5s ease both; }
+  .app-badge .dot { width: 8px; height: 8px; background: var(--mint); border-radius: 50%; }
+  h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 4vw, 3.5rem); line-height: 1.08; color: var(--white); margin-bottom: 1rem; animation: fadeUp 0.5s 0.1s ease both; }
+  h1 span { color: var(--mint); }
+  .hero-sub { font-size: 1.05rem; font-weight: 300; color: rgba(255,255,255,0.65); line-height: 1.75; margin-bottom: 2rem; animation: fadeUp 0.5s 0.2s ease both; }
+  .hero-actions { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; animation: fadeUp 0.5s 0.3s ease both; }
+  .price-pill { background: var(--mint); color: var(--navy); font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; padding: 0.5rem 1.25rem; border-radius: 100px; }
+  .paypal-btn { display: inline-flex; align-items: center; gap: 0.6rem; background: var(--white); color: var(--navy); padding: 0.85rem 1.8rem; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; transition: all 0.2s; }
+  .paypal-btn:hover { background: var(--mint); transform: scale(1.03); }
+  .hero-visual { position: relative; z-index: 1; animation: fadeUp 0.5s 0.4s ease both; }
+  .screenshot-placeholder { width: 100%; aspect-ratio: 16/10; background: rgba(255,255,255,0.06); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; color: rgba(255,255,255,0.3); font-size: 0.88rem; border: 2px dashed rgba(255,255,255,0.15); }
+  .screenshot-placeholder .ph-icon { font-size: 2.5rem; opacity: 0.4; }
+
+  .section-label { font-size: 0.82rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--coral); margin-bottom: 0.6rem; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: var(--navy); line-height: 1.1; margin-bottom: 0.75rem; }
+
+  #features { padding: 70px 5%; background: var(--navy); }
+  #features .section-label { color: var(--mint); }
+  #features .section-title { color: var(--white); margin-bottom: 2.5rem; }
+  .features-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .feat-pill { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; }
+  .feat-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .feat-text h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; color: var(--white); margin-bottom: 0.2rem; }
+  .feat-text p { font-size: 0.8rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
+  #demo { padding: 90px 5%; background: var(--white); }
+  #demo .section-intro { font-size: 1rem; color: #5a5a5a; max-width: 600px; margin-bottom: 3rem; line-height: 1.7; }
+  .demo-main { display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: center; padding: 2.5rem; border: 2.5px solid var(--navy); border-radius: 24px; background: var(--white); }
+  .demo-video-wrap { border-radius: 14px; overflow: hidden; border: 2px solid var(--navy); background: #e8ddd4; }
+  .demo-details h3 { font-family: 'Syne', sans-serif; font-size: 1.5rem; color: var(--navy); margin-bottom: 1.25rem; line-height: 1.2; }
+  .field-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .field-list li { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; color: #3a3a3a; line-height: 1.5; }
+  .field-dot { width: 10px; height: 10px; background: var(--mint); border-radius: 50%; flex-shrink: 0; margin-top: 5px; border: 2px solid var(--navy); }
+  .field-list li strong { color: var(--navy); }
+
+  #iphone { padding: 90px 5%; background: var(--navy); }
+  #iphone .section-label { color: var(--mint); }
+  #iphone .section-title { color: var(--white); margin-bottom: 0.75rem; }
+  #iphone .section-intro { font-size: 1rem; color: rgba(255,255,255,0.65); max-width: 600px; margin-bottom: 3rem; line-height: 1.7; }
+  .iphone-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+  .iphone-step { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 1.75rem 1.5rem; }
+  .iphone-step-num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--mint); margin-bottom: 0.5rem; }
+  .iphone-step h4 { font-family: 'Syne', sans-serif; font-size: 1rem; color: var(--white); margin-bottom: 0.5rem; }
+  .iphone-step p { font-size: 0.87rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+  .iphone-step p strong { color: rgba(255,255,255,0.9); }
+  .iphone-note { margin-top: 2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 1.25rem 1.5rem; font-size: 0.88rem; color: rgba(255,255,255,0.55); line-height: 1.7; }
+  .iphone-note strong { color: var(--mint); }
+
+  #buy { padding: 90px 5%; background: var(--mint); text-align: center; }
+  #buy h2 { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 800; color: var(--navy); margin-bottom: 1rem; }
+  #buy p { font-size: 1.05rem; color: var(--navy); opacity: 0.75; max-width: 480px; margin: 0 auto 2.5rem; line-height: 1.7; }
+  .buy-box { display: inline-flex; align-items: center; gap: 1.5rem; background: var(--navy); padding: 1.5rem 2.5rem; border-radius: 20px; flex-wrap: wrap; justify-content: center; }
+  .buy-price { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; color: var(--mint); }
+  .buy-note { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 0.2rem; }
+  .paypal-btn-large { display: inline-flex; align-items: center; gap: 0.7rem; background: var(--mint); color: var(--navy); padding: 1rem 2.2rem; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1.05rem; border: none; cursor: pointer; transition: all 0.2s; }
+  .paypal-btn-large:hover { background: #4a8ac4; transform: scale(1.03); }
+
+  footer { background: var(--navy); color: rgba(255,255,255,0.5); padding: 2rem 5%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.88rem; }
+  footer .logo { color: var(--white); font-size: 1.1rem; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; padding-top: 110px; }
+    .demo-main { grid-template-columns: 1fr; }
+    nav ul { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><span class="logo-dot"></span>Simple Apps Store</a>
+  <ul>
+    <li><a href="index.html">← All Apps</a></li>
+    <li><a href="#demo">See It In Action</a></li>
+    <li><a href="#buy" class="nav-cta">Buy — $0.99</a></li>
+  </ul>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-text">
+    <div class="app-badge"><span class="dot"></span> Available Now</div>
+    <h1>🏠 <span>Home Inventory</span></h1>
+    <p class="hero-sub">Catalog everything you own, room by room. Add photos, values, serial numbers and more — then export a full report for insurance, moving, or peace of mind. Plus NO ADS and free updates. All for a one-time $0.99.</p>
+    <div class="hero-actions">
+      <a href="https://www.amazon.com/dp/B0HLN4S5LZ" 
+   target="_blank"
+   style="display:inline-flex; align-items:center; gap:0.6rem;
+          background:#FF9900; color:#000000; padding:0.8rem 1.6rem;
+          border-radius:100px; font-family:'DM Sans',sans-serif;
+          font-weight:700; font-size:0.95rem; text-decoration:none;">
+  🛒 Available on Amazon Appstore
+</a>
+      <span class="price-pill">$0.99</span>
+      <a href="https://www.paypal.com/ncp/payment/U3ASYUA6THXY6" 
+   target="_blank" class="paypal-btn"
+   style="text-decoration:none;">
+  ☕ Download — $0.99
+</a>
+      
+    </div>
+  </div>
+  <div class="hero-visual">
+    <img src="home-inventory-hero.png" style="width:100%;border-radius:16px;border:3px solid rgba(255,255,255,0.15);">
+  </div>
+</section>
+
+<!-- FEATURES STRIP -->
+<section id="features">
+  <p class="section-label">What It Does</p>
+  <h2 class="section-title">Everything in one place</h2>
+  <div class="features-strip">
+    <div class="feat-pill">
+      <span class="feat-icon">🏡</span>
+      <div class="feat-text"><h4>Organize by room</h4><p>Living room, kitchen, garage — your call</p></div>
+    </div>
+    <div class="feat-pill">
+      <span class="feat-icon">📷</span>
+      <div class="feat-text"><h4>Photos &amp; videos</h4><p>Attach visual proof for every item</p></div>
+    </div>
+    <div class="feat-pill">
+      <span class="feat-icon">🔢</span>
+      <div class="feat-text"><h4>Serial numbers</h4><p>Store model &amp; serial info safely</p></div>
+    </div>
+    <div class="feat-pill">
+      <span class="feat-icon">💵</span>
+      <div class="feat-text"><h4>Item values</h4><p>Track what everything is worth</p></div>
+    </div>
+    <div class="feat-pill">
+      <span class="feat-icon">📄</span>
+      <div class="feat-text"><h4>Export reports</h4><p>Print or save for insurance claims</p></div>
+    </div>
+    <div class="feat-pill">
+      <span class="feat-icon">🔍</span>
+      <div class="feat-text"><h4>Search &amp; filter</h4><p>Find any item in seconds</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo">
+  <p class="section-label">See It In Action</p>
+  <h2 class="section-title">Adding a complete item</h2>
+  <p class="section-intro">This short demo walks through adding a real item from scratch — attaching a photo or video, filling in all the details, and saving it to your inventory.</p>
+
+  <div class="demo-main">
+    <div class="demo-video-wrap">
+      <video controls loop muted playsinline style="width:100%;display:block;">
+        <source src="hi-01-add-item.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="demo-details">
+      <h3>Everything you can record for each item</h3>
+      <ul class="field-list">
+        <li><span class="field-dot"></span><span><strong>Photo or video</strong> — attach a visual record directly to the item</span></li>
+        <li><span class="field-dot"></span><span><strong>Item name &amp; description</strong> — what it is and any useful notes</span></li>
+        <li><span class="field-dot"></span><span><strong>Room assignment</strong> — which room it belongs to</span></li>
+        <li><span class="field-dot"></span><span><strong>Purchase value</strong> — what you paid or its current worth</span></li>
+        <li><span class="field-dot"></span><span><strong>Serial number &amp; model</strong> — essential for insurance or warranty claims</span></li>
+        <li><span class="field-dot"></span><span><strong>Purchase date</strong> — when you bought it</span></li>
+        <li><span class="field-dot"></span><span><strong>Additional notes</strong> — anything else worth remembering</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- IPHONE / MOBILE SECTION -->
+<section id="iphone">
+  <p class="section-label">Use It On Your Phone</p>
+  <h2 class="section-title">Works great on iPhone &amp; Android</h2>
+  <p class="section-intro">Home Inventory runs right in your phone's browser — no App Store needed. Add it to your home screen and it works just like a real app, with full camera access for photos and receipts.</p>
+  <div class="iphone-steps">
+    <div class="iphone-step">
+      <div class="iphone-step-num">1</div>
+      <h4>Transfer the file</h4>
+      <p>After downloading, save <strong>HomeInventory.html</strong> to iCloud Drive, Google Drive, or email it to yourself.</p>
+    </div>
+    <div class="iphone-step">
+      <div class="iphone-step-num">2</div>
+      <h4>Open in Safari</h4>
+      <p>On your iPhone, open the file from iCloud Drive or your email. Make sure to use <strong>Safari</strong> for best results.</p>
+    </div>
+    <div class="iphone-step">
+      <div class="iphone-step-num">3</div>
+      <h4>Add to Home Screen</h4>
+      <p>Tap the <strong>Share icon</strong> at the bottom of Safari, then tap <strong>Add to Home Screen</strong>. It'll appear as an app icon.</p>
+    </div>
+    <div class="iphone-step">
+      <div class="iphone-step-num">4</div>
+      <h4>Start using it</h4>
+      <p>Tap the icon to open. Use <strong>Take Photo</strong> to snap items directly with your camera — no file picker needed.</p>
+    </div>
+  </div>
+  <div class="iphone-note">
+    <strong>Android users:</strong> Open the file in Chrome, tap the three-dot menu, and choose <strong>Add to Home Screen</strong>. Works the same way.
+  </div>
+</section>
+
+<!-- BUY CTA -->
+<section id="buy">
+  <h2>Ready to get Home Inventory?</h2>
+  <p>One-time purchase. Instant download. Works on Windows, Mac &amp; iPhone.</p>
+  <div class="buy-box">
+    <div>
+      <div class="buy-price">$0.99</div>
+      <div class="buy-note">One-time · instant download</div>
+    </div>
+    <a href="https://www.paypal.com/ncp/payment/U3ASYUA6THXY6" 
+   target="_blank" class="paypal-btn-large"
+   style="text-decoration:none;">
+  Buy Home Inventory — $0.99
+</a>
+  </div>
+  <p style="margin-top:1.5rem;font-size:0.85rem;">Also available: <a href="calendarcco.html" style="color:var(--navy);font-weight:600;">CalendarCo →</a> &nbsp;|&nbsp; <a href="index.html" style="color:var(--navy);font-weight:600;">Buy both for $1.75 →</a></p>
+</section>
+
+<footer>
+  <a href="index.html" class="logo"><span class="logo-dot"></span>Simple Apps Store</a>
+  <span>Questions? help@simpleappsstore.com</span>
+  <span>© 2026 simpleappsstore.com · All rights reserved</span>
+</footer>
+
+</body>
+</html>

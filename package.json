@@ -1,0 +1,30 @@
+{
+  "name": "home-inventory",
+  "version": "1.0.0",
+  "description": "Home Inventory App",
+  "author": "Your Name",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable"
+  },
+    "build": {
+    "appId": "com.yourname.homeinventory",
+    "productName": "Home Inventory",
+    "files": [
+      "HomeInventory.html",
+      "main.js",
+      "favicon.png",
+      "apple-touch-icon.png"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "icon.ico"
+    }
+  },
+  "devDependencies": {
+    "electron": "34.0.0",
+    "electron-builder": "^26.8.1"
+  }
+}
+
